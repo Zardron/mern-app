@@ -1,9 +1,18 @@
+import errorHandler from "../middleware/errorMiddleware.js";
+
 const getGoal = (req, res) => {
   res.status(200).json({ message: "GET GOAL" });
 };
 
 const addGoal = (req, res) => {
-  res.status(200).json({ message: "ADD GOAL" });
+  if (!req.body.text) {
+    errorHandler({
+      status: 400,
+      message: "Text field is required!",
+    });
+  } else {
+    res.status(200).json({ message: "ADD GOAL" });
+  }
 };
 
 const updateGoal = (req, res) => {
