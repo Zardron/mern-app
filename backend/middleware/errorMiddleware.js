@@ -1,12 +1,18 @@
-const errorHandler = (err, req, res, next) => {
-  const statusCode = res.statusCode || 500;
+export const serverError = (err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
   const message = err.message;
 
-  res.json({
+  return res.status(statusCode).json({
     statusCode: statusCode,
     message: message,
     stack: process.env.NODE_ENV === "production" ? null : err.stack,
   });
 };
 
-export default errorHandler;
+export const errorHandler = (statusCode, message) => {
+  const error = new Error();
+  error.statusCode = statusCode;
+  error.message = message;
+
+  return error;
+};
