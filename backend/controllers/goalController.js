@@ -1,7 +1,8 @@
 import asyncHandler from "express-async-handler";
 import Goal from "../models/goalModel.js";
+import User from "../models/userModel.js";
 import { errorHandler } from "../middleware/errorMiddleware.js";
-import { DUPLICATE, SUCCESS } from "../utils/constant.js";
+import { DUPLICATE, SUCCESS, UNAUTHORIZED } from "../utils/constant.js";
 import { tryCatch } from "../utils/tryCatch.js";
 import { validateMongoDbId } from "../middleware/validateId.js";
 
@@ -55,6 +56,17 @@ const updateGoal = asyncHandler(
 
     validateMongoDbId(id);
 
+    const user = await User.findById(req.user.id);
+    const goal = await Goal.findById(id);
+
+    if (!user) {
+      throw errorHandler(NOT_FOUND, "User not found");
+    }
+
+    if (goal.user.toString() !== user.id) {
+      throw errorHandler(UNAUTHORIZED, "User not authorized");
+    }
+
     const goalDetails = await Goal.findByIdAndUpdate(
       id,
       {
@@ -74,6 +86,17 @@ const deleteGoal = asyncHandler(
     const { id } = req.params;
 
     validateMongoDbId(id);
+
+    const user = await User.findById(req.user.id);
+    const goal = await Goal.findById(id);
+
+    if (!user) {
+      throw errorHandler(NOT_FOUND, "User not found");
+    }
+
+    if (goal.user.toString() !== user.id) {
+      throw errorHandler(UNAUTHORIZED, "User not authorized");
+    }
 
     const deletedGoals = await Goal.findByIdAndUpdate(
       id,
