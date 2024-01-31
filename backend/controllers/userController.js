@@ -16,7 +16,13 @@ const getUsers = asyncHandler(
 
 const getUserDetails = asyncHandler(
   tryCatch(async (req, res) => {
-    res.status(200).json({ message: "GET USER DETAILS" });
+    const { _id, name, email } = await User.findById(req.user.id);
+
+    res.status(SUCCESS).json({
+      id: _id,
+      name,
+      email,
+    });
   })
 );
 
