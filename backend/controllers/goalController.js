@@ -1,7 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Goal from "../models/goalModel.js";
 import { errorHandler } from "../middleware/errorMiddleware.js";
-import { DUPLICATE_ERROR, SUCCESS } from "../utils/constant.js";
+import { DUPLICATE, SUCCESS } from "../utils/constant.js";
 import { tryCatch } from "../utils/tryCatch.js";
 import { validateMongoDbId } from "../middleware/validateId.js";
 

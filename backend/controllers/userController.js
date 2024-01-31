@@ -1,10 +1,10 @@
 import asyncHandler from "express-async-handler";
 import { tryCatch } from "../utils/tryCatch.js";
 import { errorHandler } from "../middleware/errorMiddleware.js";
-import { DUPLICATE_ERROR, REQUIRED, SUCCESS } from "../utils/constant.js";
-import jwt from "jsonwebtoken";
+import { DUPLICATE, INVALID, REQUIRED, SUCCESS } from "../utils/constant.js";
 import bcrypt from "bcryptjs";
 import User from "../models/userModel.js";
+import { generateToken } from "../middleware/generateToken.js";
 
 const getUsers = asyncHandler(
   tryCatch(async (req, res) => {
@@ -29,7 +29,7 @@ const registerUser = asyncHandler(
     if (!name || !email || !password)
       throw errorHandler(REQUIRED, "All fields are required");
 
-    if (checkEmail) throw errorHandler(DUPLICATE_ERROR, "Email already exist");
+    if (checkEmail) throw errorHandler(DUPLICATE, "Email already exist");
 
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
@@ -44,13 +44,29 @@ const registerUser = asyncHandler(
       _id: newUser._id,
       name: newUser.name,
       email: newUser.email,
+      token: generateToken(newUser._id),
     });
   })
 );
 
 const loginUser = asyncHandler(
   tryCatch(async (req, res) => {
-    res.status(200).json({ message: "LOGIN USER" });
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    const comparePassword = await bcrypt.compare(password, user.password);
+
+    if (user && comparePassword) {
+      res.status(SUCCESS).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id),
+      });
+    } else {
+      throw errorHandler(INVALID, "Invalid Credentials");
+    }
   })
 );
 
