@@ -6,6 +6,13 @@ const goalSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please add text value"],
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

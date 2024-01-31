@@ -1,27 +1,34 @@
 import asyncHandler from "express-async-handler";
 import Goal from "../models/goalModel.js";
 import { errorHandler } from "../middleware/errorMiddleware.js";
-import {
-  DUPLICATE_ERROR,
-  NOT_FOUND_ERROR,
-  SUCCESS,
-} from "../utils/constant.js";
+import { DUPLICATE_ERROR, SUCCESS } from "../utils/constant.js";
 import { tryCatch } from "../utils/tryCatch.js";
+import { validateMongoDbId } from "../middleware/validateId.js";
 
-const getGoal = asyncHandler(async (req, res) => {
-  const goals = await Goal.find();
+const getGoal = asyncHandler(
+  tryCatch(async (req, res) => {
+    const goals = await Goal.find();
 
-  res.status(200).json(goals);
-});
+    res.status(200).json(goals);
+  })
+);
+
+const getDeletedGoals = asyncHandler(
+  tryCatch(async (req, res) => {
+    const goals = await Goal.find({ isDeleted: true });
+
+    res.status(200).json(goals);
+  })
+);
 
 const addGoal = asyncHandler(
-  tryCatch(async (req, res, next) => {
+  tryCatch(async (req, res) => {
     const { text } = req.body;
 
     const checkGoal = await Goal.findOne({ text: text });
 
     if (checkGoal) {
-      next(errorHandler(DUPLICATE_ERROR, "Goal already exist!"));
+      throw errorHandler(DUPLICATE_ERROR, "Goal already exist!");
     } else {
       const newGoal = await Goal.create({
         text: text,
@@ -32,12 +39,46 @@ const addGoal = asyncHandler(
   })
 );
 
-const updateGoal = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: "UPDATE GOAL" });
-});
+const updateGoal = asyncHandler(
+  tryCatch(async (req, res) => {
+    const { id } = req.params;
+    const { text } = req.body;
 
-const deleteGoal = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: "DELETE GOAL" });
-});
+    validateMongoDbId(id);
 
-export { getGoal, addGoal, updateGoal, deleteGoal };
+    const goalDetails = await Goal.findByIdAndUpdate(
+      id,
+      {
+        text: text,
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.status(SUCCESS).json(goalDetails);
+  })
+);
+
+const deleteGoal = asyncHandler(
+  tryCatch(async (req, res) => {
+    const { id } = req.params;
+
+    validateMongoDbId(id);
+
+    const deletedGoals = await Goal.findByIdAndUpdate(
+      id,
+      {
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.status(SUCCESS).json(deletedGoals);
+  })
+);
+
+export { getGoal, addGoal, updateGoal, deleteGoal, getDeletedGoals };
