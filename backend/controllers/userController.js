@@ -6,11 +6,25 @@ const getUsers = asyncHandler(
     res.status(200).json({ message: "GET USER" });
   })
 );
-const addUsers = asyncHandler(
+
+const getUserDetails = asyncHandler(
   tryCatch(async (req, res) => {
-    res.status(200).json({ message: "ADD USER" });
+    res.status(200).json({ message: "GET USER DETAILS" });
   })
 );
+
+const registerUser = asyncHandler(
+  tryCatch(async (req, res) => {
+    res.status(200).json({ message: "REGISTER USER" });
+  })
+);
+
+const loginUser = asyncHandler(
+  tryCatch(async (req, res) => {
+    res.status(200).json({ message: "LOGIN USER" });
+  })
+);
+
 const updateUsers = asyncHandler(
   tryCatch(async (req, res) => {
     res.status(200).json({ message: "UPDATE USER" });
@@ -22,4 +36,11 @@ const deleteUsers = asyncHandler(
   })
 );
 
-export { getUsers, addUsers, updateUsers, deleteUsers };
+export {
+  getUsers,
+  getUserDetails,
+  registerUser,
+  loginUser,
+  updateUsers,
+  deleteUsers,
+};
