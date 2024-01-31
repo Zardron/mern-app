@@ -1,9 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
-import goalRoutes from "./routes/goal.js";
 import bodyParser from "body-parser";
-import { serverError } from "./middleware/errorMiddleware.js";
 import dbConn from "./config/dbConn.js";
+import { serverError } from "./middleware/errorMiddleware.js";
+import goalRoutes from "./routes/goal.js";
+import userRoutes from "./routes/user.js";
 
 // Config
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Routers
 app.use("/api/goal/", goalRoutes);
+app.use("/api/user/", userRoutes);
 
 // Middleware
 app.use(serverError);
