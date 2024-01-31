@@ -13,6 +13,14 @@ const getGoal = asyncHandler(
   })
 );
 
+const getUserGoals = asyncHandler(
+  tryCatch(async (req, res) => {
+    const goals = await Goal.find({ user: req.user.id });
+
+    res.status(200).json(goals);
+  })
+);
+
 const getDeletedGoals = asyncHandler(
   tryCatch(async (req, res) => {
     const goals = await Goal.find({ isDeleted: true });
@@ -31,6 +39,7 @@ const addGoal = asyncHandler(
       throw errorHandler(DUPLICATE_ERROR, "Goal already exist!");
     } else {
       const newGoal = await Goal.create({
+        user: req.user.id,
         text: text,
       });
 
@@ -81,4 +90,11 @@ const deleteGoal = asyncHandler(
   })
 );
 
-export { getGoal, addGoal, updateGoal, deleteGoal, getDeletedGoals };
+export {
+  getGoal,
+  getUserGoals,
+  addGoal,
+  updateGoal,
+  deleteGoal,
+  getDeletedGoals,
+};
