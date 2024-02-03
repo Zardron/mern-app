@@ -7,7 +7,7 @@
   "scripts": {
     "start": "nodemon backend/server.js",
     "client": "npm start --prefix frontend",
-    "dev": "npm start --prefix frontend"
+    "dev": "concurrently \"npm run start\" \"npm run client\" "
   },
   "keywords": [],
   "author": "",

@@ -23,13 +23,13 @@ const Register = () => {
   useEffect(() => {
     if (isError) {
       toast.error(message);
+      dispatch(reset());
     }
 
     if (isSuccess || user) {
       navigate("/");
+      dispatch(reset());
     }
-
-    dispatch(reset());
   }, [user, isSuccess, isError, isLoading, message, navigate, dispatch]);
 
   const { name, email, password, password2 } = formData;
